@@ -1,0 +1,532 @@
+[
+  {
+    "name": "Исп-18-1",
+    "number": 0,
+    "year": 18
+  },
+  {
+    "name": "Исп-18-2",
+    "number": 0,
+    "year": 18
+  },
+  {
+    "name": "Исп-19-1",
+    "number": 0,
+    "year": 19
+  },
+  {
+    "name": "Исп-19-2",
+    "number": 0,
+    "year": 19
+  },
+  {
+    "name": "ИСп-19-3",
+    "number": 0,
+    "year": 19
+  },
+  {
+    "name": "Исп-19-4",
+    "number": 0,
+    "year": 19
+  },
+  {
+    "name": "Исп-20-1",
+    "number": 0,
+    "year": 20
+  },
+  {
+    "name": "ИСп-20-2",
+    "number": 0,
+    "year": 20
+  },
+  {
+    "name": "ИСп-20-3",
+    "number": 0,
+    "year": 20
+  },
+  {
+    "name": "ИспК-18-1",
+    "number": 0,
+    "year": 18
+  },
+  {
+    "name": "ИспК-18-2",
+    "number": 0,
+    "year": 18
+  },
+  {
+    "name": "ИспК-19-1",
+    "number": 0,
+    "year": 19
+  },
+  {
+    "name": "ИспК-20-1",
+    "number": 0,
+    "year": 20
+  },
+  {
+    "name": "Кс-17-1",
+    "number": 0,
+    "year": 17
+  },
+  {
+    "name": "Кс-17-2",
+    "number": 0,
+    "year": 17
+  },
+  {
+    "name": "Кс-18-1",
+    "number": 0,
+    "year": 18
+  },
+  {
+    "name": "Кс-19-1",
+    "number": 0,
+    "year": 19
+  },
+  {
+    "name": "Кс-20-1",
+    "number": 0,
+    "year": 20
+  },
+  {
+    "name": "Кс-20-2",
+    "number": 0,
+    "year": 20
+  },
+  {
+    "name": "КсК-18-1",
+    "number": 0,
+    "year": 18
+  },
+  {
+    "name": "КсК-19-1",
+    "number": 0,
+    "year": 19
+  },
+  {
+    "name": "Пр-17-1",
+    "number": 0,
+    "year": 17
+  },
+  {
+    "name": "Пр-17-2",
+    "number": 0,
+    "year": 17
+  },
+  {
+    "name": "ПрК-17-1",
+    "number": 0,
+    "year": 17
+  },
+  {
+    "name": "Мдс-17-1",
+    "number": 1,
+    "year": 17
+  },
+  {
+    "name": "Мдс-18-1",
+    "number": 1,
+    "year": 18
+  },
+  {
+    "name": "Мдс-19-1",
+    "number": 1,
+    "year": 19
+  },
+  {
+    "name": "Мдс-20-1",
+    "number": 1,
+    "year": 20
+  },
+  {
+    "name": "Мэ-17-1",
+    "number": 1,
+    "year": 17
+  },
+  {
+    "name": "МЭ-18-1",
+    "number": 1,
+    "year": 18
+  },
+  {
+    "name": "Мэ-19-1",
+    "number": 1,
+    "year": 19
+  },
+  {
+    "name": "Мэ-20-1",
+    "number": 1,
+    "year": 20
+  },
+  {
+    "name": "О-17-1",
+    "number": 1,
+    "year": 17
+  },
+  {
+    "name": "О-17-2",
+    "number": 1,
+    "year": 17
+  },
+  {
+    "name": "О-18-1",
+    "number": 1,
+    "year": 18
+  },
+  {
+    "name": "О-18-2",
+    "number": 1,
+    "year": 18
+  },
+  {
+    "name": "О-18-3",
+    "number": 1,
+    "year": 18
+  },
+  {
+    "name": "О-19-1",
+    "number": 1,
+    "year": 19
+  },
+  {
+    "name": "О-19-2",
+    "number": 1,
+    "year": 19
+  },
+  {
+    "name": "О-20-1",
+    "number": 1,
+    "year": 20
+  },
+  {
+    "name": "О-20-2",
+    "number": 1,
+    "year": 20
+  },
+  {
+    "name": "Тэ-17-1 изм",
+    "number": 1,
+    "year": 17
+  },
+  {
+    "name": "Тэ-17-1",
+    "number": 1,
+    "year": 17
+  },
+  {
+    "name": "Тэ-17-2",
+    "number": 1,
+    "year": 17
+  },
+  {
+    "name": "Тэ-17-3",
+    "number": 1,
+    "year": 17
+  },
+  {
+    "name": "Тэ-18-1",
+    "number": 1,
+    "year": 18
+  },
+  {
+    "name": "Тэ-18-2",
+    "number": 1,
+    "year": 18
+  },
+  {
+    "name": "Тэ-19-1",
+    "number": 1,
+    "year": 19
+  },
+  {
+    "name": "Тэ-19-2",
+    "number": 1,
+    "year": 19
+  },
+  {
+    "name": "Тэ-20-1",
+    "number": 1,
+    "year": 20
+  },
+  {
+    "name": "Тэ-20-2",
+    "number": 1,
+    "year": 20
+  },
+  {
+    "name": "А-17-1",
+    "number": 2,
+    "year": 17
+  },
+  {
+    "name": "А-17-2",
+    "number": 2,
+    "year": 17
+  },
+  {
+    "name": "АТп-18-1",
+    "number": 2,
+    "year": 18
+  },
+  {
+    "name": "АТп-19-1",
+    "number": 2,
+    "year": 19
+  },
+  {
+    "name": "АТп-20-1",
+    "number": 2,
+    "year": 20
+  },
+  {
+    "name": "АТп-20-2",
+    "number": 2,
+    "year": 20
+  },
+  {
+    "name": "АтпК-18-1",
+    "number": 2,
+    "year": 18
+  },
+  {
+    "name": "М-17-1",
+    "number": 2,
+    "year": 17
+  },
+  {
+    "name": "М-17-2",
+    "number": 2,
+    "year": 17
+  },
+  {
+    "name": "Мг-17-1",
+    "number": 2,
+    "year": 17
+  },
+  {
+    "name": "Мг-19-1",
+    "number": 2,
+    "year": 19
+  },
+  {
+    "name": "Мг-20-1",
+    "number": 2,
+    "year": 20
+  },
+  {
+    "name": "МгК-18-1",
+    "number": 2,
+    "year": 18
+  },
+  {
+    "name": "Мр-18-1",
+    "number": 2,
+    "year": 18
+  },
+  {
+    "name": "Мр-19-1",
+    "number": 2,
+    "year": 19
+  },
+  {
+    "name": "Мр-19-2",
+    "number": 2,
+    "year": 19
+  },
+  {
+    "name": "Мр-19-3",
+    "number": 2,
+    "year": 19
+  },
+  {
+    "name": "Мр-20-1",
+    "number": 2,
+    "year": 20
+  },
+  {
+    "name": "Мр-20-2",
+    "number": 2,
+    "year": 20
+  },
+  {
+    "name": "Т-17-1",
+    "number": 2,
+    "year": 17
+  },
+  {
+    "name": "Т-19-1",
+    "number": 2,
+    "year": 19
+  },
+  {
+    "name": "Т-19-2",
+    "number": 2,
+    "year": 19
+  },
+  {
+    "name": "Т-19-3",
+    "number": 2,
+    "year": 19
+  },
+  {
+    "name": "Т-20-1",
+    "number": 2,
+    "year": 20
+  },
+  {
+    "name": "Т-20-2",
+    "number": 2,
+    "year": 20
+  },
+  {
+    "name": "Та-17-1",
+    "number": 2,
+    "year": 17
+  },
+  {
+    "name": "Та-17-2",
+    "number": 2,
+    "year": 17
+  },
+  {
+    "name": "ТО-18-1",
+    "number": 2,
+    "year": 18
+  },
+  {
+    "name": "ТО-19-1",
+    "number": 2,
+    "year": 19
+  },
+  {
+    "name": "ТО-20-1",
+    "number": 2,
+    "year": 20
+  },
+  {
+    "name": "ТО-20-2",
+    "number": 2,
+    "year": 20
+  },
+  {
+    "name": "ДаК-18-1",
+    "number": 3,
+    "year": 18
+  },
+  {
+    "name": "ЗиК-18-1",
+    "number": 3,
+    "year": 18
+  },
+  {
+    "name": "ЗиК-19-1",
+    "number": 3,
+    "year": 19
+  },
+  {
+    "name": "ЗиК-19-5",
+    "number": 3,
+    "year": 19
+  },
+  {
+    "name": "ЗиК-20-1",
+    "number": 3,
+    "year": 20
+  },
+  {
+    "name": "ЗиК-20-5",
+    "number": 3,
+    "year": 20
+  },
+  {
+    "name": "ПКд-18-1",
+    "number": 3,
+    "year": 18
+  },
+  {
+    "name": "ПКд-19-1",
+    "number": 3,
+    "year": 19
+  },
+  {
+    "name": "ПКд-20-1",
+    "number": 3,
+    "year": 20
+  },
+  {
+    "name": "ПМг-16-1у",
+    "number": 3,
+    "year": 16
+  },
+  {
+    "name": "ПМо-16-1у",
+    "number": 3,
+    "year": 16
+  },
+  {
+    "name": "Пс-16-1у",
+    "number": 3,
+    "year": 16
+  },
+  {
+    "name": "ПТК-17-1",
+    "number": 3,
+    "year": 17
+  },
+  {
+    "name": "ПТэ-16-1у",
+    "number": 3,
+    "year": 16
+  },
+  {
+    "name": "С-17-1",
+    "number": 3,
+    "year": 17
+  },
+  {
+    "name": "С-18-1",
+    "number": 3,
+    "year": 18
+  },
+  {
+    "name": "С-19-1",
+    "number": 3,
+    "year": 19
+  },
+  {
+    "name": "С-20-1",
+    "number": 3,
+    "year": 20
+  },
+  {
+    "name": "С-20-2",
+    "number": 3,
+    "year": 20
+  },
+  {
+    "name": "ЭК-18-1",
+    "number": 3,
+    "year": 18
+  },
+  {
+    "name": "ЭК-19-1",
+    "number": 3,
+    "year": 19
+  },
+  {
+    "name": "ЭК-19-5",
+    "number": 3,
+    "year": 19
+  },
+  {
+    "name": "ЭК-20-1",
+    "number": 3,
+    "year": 20
+  },
+  {
+    "name": "ЭК-20-5",
+    "number": 3,
+    "year": 20
+  }
+]
