@@ -10,7 +10,7 @@ require 'fileutils'
 ## VARIABLES DEFINITION ##
 #https://newlms.magtu.ru/pluginfile.php/622195/mod_folder/content/0/
 mainSiteLink = "https://newlms.magtu.ru/mod/folder/view.php?id=";
-token = '1337747747:AAHQYgr8zQ04hSkzD1FFmKeS9RPghCUm0aU';
+token = ENV["TOKEN_TG"];
 $branchArray = [{:number => 0, :id => 219213, :fileRoom => 622200}, {:number => 1, :id => 219208, :fileRoom => 622195},
  {:number => 2, :id => 219206, :fileRoom => 622193}, {:number => 3, :id => 219205, :fileRoom => 622192}];
 groupArray = [];
