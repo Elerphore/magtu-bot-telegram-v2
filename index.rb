@@ -47,7 +47,6 @@ end
 
 ## DATABASE ##
 def databaseConnection() 
-	#$con = Mysql2::Client.new(:host => "127.0.01", :username => "root", :port => 3306, :database => "magtu_bot_id");
 	$con = Mysql2::Client.new(:host => ENV["CLEARDB_LINK"], :username => ENV["CLEARDB_USERNAME"], :port => 3306, :database => ENV["DB_NAME"], :password => ENV["CLEARDB_KEY"]);
 end
 ## DATABASE ##
@@ -400,6 +399,10 @@ def parsingChangeFile(groupName, subgroup, day)
 				if((teacher == nil && numberRoom == nil) && name)
 					teacher = "Site";
 					numberRoom = "Site"
+				elsif(item[:lesson].match?(/^\D{12}\s{1,2}$/))
+					name = "Пара отменена"
+					teacher = " ";
+					numberRoom = " "
 				end
 				changeArray.push({:name => name, :roomNumber => numberRoom[0], :number => item[:number], :teacher => teacher[0], :subgroup => item[:subgroup]});
 			end
