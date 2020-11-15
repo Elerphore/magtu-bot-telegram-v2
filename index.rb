@@ -7,6 +7,13 @@ require 'nokogiri'
 require 'net/http'
 require 'fileutils'
 
+
+messageInlineKeyboardButtons = [
+	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Донат', url: 'https://sobe.ru/na/elerphore'),
+]
+
+$messageInlineKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: messageInlineKeyboardButtons)
+
 mainSiteLink = "https://newlms.magtu.ru/mod/folder/view.php?id=";
 $changePageLink = "https://newlms.magtu.ru/mod/folder/view.php?id=219250";
 $changeFolderContainLink = "https://newlms.magtu.ru/pluginfile.php/622284/mod_folder/content/0/";
@@ -17,7 +24,6 @@ groupArray = [];
 yearGroupArray = Array.new(DateTime.now.strftime("%y").to_i - (DateTime.now.strftime("%y").to_i - 5)) {|i|(DateTime.now.strftime("%y").to_i - 5) + (i + 1)};
 $weekArray = [{:name => "Понедельник", :number => 0}, {:name => "Понедельник", :number => 1}, {:name => "Вторник", :number => 2},
  {:name => "Среда", :number => 3}, {:name => "Четверг", :number => 4},{:name => "Пятница", :number => 5}, {:name => "Суббота", :number => 6}];
-
 
 
 staticKeyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: 
@@ -214,11 +220,11 @@ def parsingData(groupName, subgroup, day)
 	sendingLessons = sendingLessons.sort_by {|item| item[:number]}
 	stringLessons = [];
 	sendingLessons.map {|item| 
-		stringLessons.push("№#{item[:number]} #{item[:name]} #{item[:teacher].delete("\n")} #{item[:roomNumber]}")
+		stringLessons.push("№#{item[:number]} #{item[:name].split("  ")[0]} #{item[:teacher].delete("\n")} #{item[:roomNumber]}")
 	}
 
-	$bot.api.send_message(chat_id: $message.from.id, text: "Расписание <b>#{groupName}</b> #{subgroup} подгруппы на <b>#{$weekArray[selecteDayNumber][:name]}</b>\n
-#{stringLessons.join("\n")}", parse_mode: "HTML");
+	$bot.api.send_message(chat_id: $message.from.id, text: "Расписание на <b>#{$weekArray[selecteDayNumber][:name]} (#{isEven.to_date}) <b>#{subgroup}</b> подгруппы #{groupName}  </b>\n
+#{stringLessons.join("\n").gsub("  ", "")}", parse_mode: "HTML", reply_markup: $messageInlineKeyboard);
 end
 
 def parsingChangeFile(groupName, subgroup, day)
