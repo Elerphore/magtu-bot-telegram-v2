@@ -191,6 +191,7 @@ end
 def parsingData(groupName, subgroup, day) 
 	selectedGroup = Roo::Spreadsheet.open("#{groupName}.xlsx").sheet(0);
 	selectedDay = [];
+	isEven = DateTime.now + day;
 
 	if (Date.today.wday + day == 7)
 		 day = 0;
@@ -204,7 +205,11 @@ def parsingData(groupName, subgroup, day)
 	end
 	j = 1;
 	lessons = [];
-	dayCoordinate = selectedDay[Date.today.cweek.even? ? 0 : 1].coordinate;
+ 	#p Date.today.wday;
+	#p Date.today.cweek.even?;
+
+	dayCoordinate = selectedDay[isEven.cweek.even? ? 0 : 1].coordinate;
+
 	while(selectedGroup.cell(dayCoordinate[0] + j, dayCoordinate[1]) != nil)
 		lessonNumber = selectedGroup.cell(dayCoordinate[0] + j, dayCoordinate[1]);
 		firstGroupCellName = selectedGroup.cell(dayCoordinate[0] + j, dayCoordinate[1] + 1);
@@ -231,6 +236,8 @@ def parsingData(groupName, subgroup, day)
 	#changeLessons.map {|item| p item};
 	#p "divider"
 	#lessons.map {|item| p item};
+	#p lessons.length;
+	#p changeLessons.length;
 
 	#p "diver1"
 
@@ -242,26 +249,31 @@ def parsingData(groupName, subgroup, day)
 		$bot.api.send_message(chat_id: $message.from.id, text: "На данный день пар нет.", parse_mode: "HTML");
 		return;
 	else
-			if(lessons.length <= changeLessons.length)
-		lessons.map {|item| 
-			changeLessons.map {|changeItem| 
-				if(item[:number] == changeItem[:number])
-					sendingLessons.push(changeItem);
-					changeLessons.delete(changeItem);
-					break;
-				end
-				sendingLessons.push(item);
-				lessons.delete(item);
-				break;
+		if(lessons.length <= changeLessons.length)
+			lessons.map {|item| 
+				changeLessons.map {|changeItem| 
+					if(item[:number] == changeItem[:number])
+						sendingLessons.push(changeItem);
+						changeLessons.delete(changeItem);
+						break;
+					elsif(!lessons.detect {|e| changeLessons.map {|ech| e[:number] == ech[:number]}})
+						sendingLessons.push(item);
+						lessons.delete(item);
+						break;
+					end
+				};
 			};
-		};
 
-
-	changeLessons.map {|item| 
-		if(!sendingLessons.include?(item))
-			sendingLessons.push(item);
-		end
-	}
+		changeLessons.map {|item| 
+			if(!sendingLessons.include?(item))
+				sendingLessons.push(item);
+			end
+			lessons.map {|item| 
+				if(!sendingLessons.include?(item) && (item[:subgroup] == 0 || item[:subgroup] == subgroup) && !sendingLessons.detect {|e| e[:number] == item[:number]})
+					sendingLessons.push(item);
+				end
+			}
+		}
 	else
 		lessons.map {|item| 
 			changeLessons.map {|changeItem| 
@@ -284,11 +296,13 @@ def parsingData(groupName, subgroup, day)
 	end
 	end
 
+	sendingLessons = sendingLessons.sort_by {|item| item[:number]}
 	stringLessons = [];
 	sendingLessons.map {|item| 
 		stringLessons.push("№#{item[:number]} - #{item[:name]} - #{item[:teacher]} - #{item[:roomNumber]}")
 	}
 
+	#sendingLessons.map {|item| p item}
 	$bot.api.send_message(chat_id: $message.from.id, text: "Расписание #{groupName} #{subgroup} подгруппы ", parse_mode: "HTML");
 	$bot.api.send_message(chat_id: $message.from.id, text: stringLessons.join("\n"), parse_mode: "HTML");
 end
