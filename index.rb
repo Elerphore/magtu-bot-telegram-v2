@@ -219,22 +219,19 @@ def parsingData(groupName, subgroup, day)
 end
 
 def parsingChangeFile(groupName, subgroup, day)
-
 	currentDate = DateTime.now.to_date + day;
 	if((currentDate).sunday?) 
 		currentDate += 1;
 	end
-
 	
 	selectedDateFile = [];
 	groupArray = [];
 	parsGroupArray = [];
-	htmlDocument = Nokogiri::HTML(URI.open($changePageLink))
 
+	htmlDocument = Nokogiri::HTML(URI.open($changePageLink))
 	htmlDocument.css('span.fp-filename-icon a').each_with_index do |link, i|
 		groupArray.push(link.content.split(".xlsx"));
 	end
-
 
 	groupArray.each_with_index do |item, i|
 		FileUtils.mkdir_p './change_lessons/';
@@ -261,9 +258,11 @@ def parsingChangeFile(groupName, subgroup, day)
 			end
 		end
 		};
+
 	if(File::exists?( "./change_lessons/#{selectedDateFile}")) 
 		selectedGroup = [];
 		changeAgenda = Roo::Spreadsheet.open("./change_lessons/#{selectedDateFile}").sheet(0);
+		
 		changeAgenda.each_row_streaming do |row|
 			row.each_with_index do |item, i|
 				if (item.value.to_s.downcase == groupName.downcase);
@@ -271,7 +270,7 @@ def parsingChangeFile(groupName, subgroup, day)
 				end
 			end
 		end
-
+		
 		if(selectedGroup == [])
 			return [];
 		end
@@ -281,13 +280,13 @@ def parsingChangeFile(groupName, subgroup, day)
 		dayLessons = 0;
 		changeArray = [];
 		parsedArray = [];
+		returningArray = [];
 
 		while changeArray == [] do
 			i = 0;
 			until changeAgenda.cell(j + i + lessons, 3) == nil do
 				i = i + 1;
 			end 
-
 			if(changeAgenda.cell(j + lessons, 1) == $weekArray[Date.today.wday + day][:name])
 				dayLessons =  i;
 				for g in 0..(dayLessons)
@@ -310,24 +309,26 @@ def parsingChangeFile(groupName, subgroup, day)
 			end
 		end
 
-		changeArray = [];
 		parsedArray.compact.each do |item|
 			if(item[:lesson] != nil)
 				teacher = item[:lesson].match(/\W{5,10}\s\W{1}[.]\W{1}[.]/);
 				numberRoom = item[:lesson].match(/\W{1}\d{3}/);
 				name = item[:lesson].match(/[(]\W{2,8}[)]\s.{1,38}\S/).to_s.split(/\W{1}\d{3}/)[0];
 				if((teacher == nil && numberRoom == nil) && name)
-					teacher = "Site";
-					numberRoom = "Site"
+					teacher = " ";
+					numberRoom = " "
 				elsif(item[:lesson].match?(/^\D{12}\s{1,2}$/))
 					name = "Пара отменена"
 					teacher = " ";
 					numberRoom = " "
 				end
-				changeArray.push({:name => name, :roomNumber => numberRoom[0], :number => item[:number], :teacher => teacher[0], :subgroup => item[:subgroup]});
+				returningArray.push({:name => name, :roomNumber => numberRoom[0], :number => item[:number], :teacher => teacher[0], :subgroup => item[:subgroup]});
 			end
 		end
-		return changeArray;
+		return returningArray;
+	else
+		$bot.api.send_message(chat_id: $message.from.id, text: "Боту не удалось получить доступ к файлу с заменами.", parse_mode: "HTML");
+		return [];
 	end
 end
 
