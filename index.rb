@@ -9,8 +9,8 @@ require 'fileutils'
 
 
 messageInlineKeyboardButtons = [
-	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Донат', url: 'https://sobe.ru/na/elerphore'),
-]
+Telegram::Bot::Types::InlineKeyboardButton.new(text: "\xF0\x9F\x92\xB5 Донат", url: 'https://sobe.ru/na/elerphore'),
+    ]
 
 $messageInlineKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: messageInlineKeyboardButtons)
 
@@ -24,6 +24,7 @@ groupArray = [];
 yearGroupArray = Array.new(DateTime.now.strftime("%y").to_i - (DateTime.now.strftime("%y").to_i - 5)) {|i|(DateTime.now.strftime("%y").to_i - 5) + (i + 1)};
 $weekArray = [{:name => "Понедельник", :number => 0}, {:name => "Понедельник", :number => 1}, {:name => "Вторник", :number => 2},
  {:name => "Среда", :number => 3}, {:name => "Четверг", :number => 4},{:name => "Пятница", :number => 5}, {:name => "Суббота", :number => 6}];
+
 
 
 staticKeyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: 
@@ -321,7 +322,7 @@ def parsingChangeFile(groupName, subgroup, day)
 		parsedArray.compact.each do |item|
 			if(item[:lesson] != nil)
 				teacher = item[:lesson].match(/\W{5,10}\s\W{1}[.]\W{1}[.]/);
-				numberRoom = item[:lesson].match(/\W{1}\d{3}/);
+				numberRoom = item[:lesson].match(/\W{1}\d{2,3}/);
 				name = item[:lesson].match(/[(]\W{2,8}[)]\s.{1,38}\S/).to_s.split(/\W{1}\d{3}/)[0];
 				if((teacher == nil && numberRoom == nil) && name)
 					teacher = " ";
