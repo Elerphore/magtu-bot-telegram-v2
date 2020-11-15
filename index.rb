@@ -113,14 +113,15 @@ end
 def parsingData(groupName, subgroup, day) 
 	selectedGroup = Roo::Spreadsheet.open("#{groupName}.xlsx").sheet(0);
 	selectedDay = [];
+	selecteDayNumber = Date.today.wday + day;
 	isEven = DateTime.now + day;
 
-	if (Date.today.wday + day == 7)
-		 day = 0;
+	if (selecteDayNumber == 7)
+		 selecteDayNumber = 1;
 	end
 	selectedGroup.each_row_streaming do |row|
 		row.each do |item|
-			if (item.value == $weekArray[Date.today.wday + day][:name]);
+			if (item.value == $weekArray[selecteDayNumber][:name]);
 				selectedDay.push(item);
 			end
 		end
