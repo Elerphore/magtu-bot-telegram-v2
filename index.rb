@@ -7,9 +7,9 @@ require 'nokogiri'
 require 'net/http'
 require 'fileutils'
 
-## VARIABLES DEFINITION ##
-#https://newlms.magtu.ru/pluginfile.php/622195/mod_folder/content/0/
 mainSiteLink = "https://newlms.magtu.ru/mod/folder/view.php?id=";
+$changePageLink = "https://newlms.magtu.ru/mod/folder/view.php?id=219250";
+$changeFolderContainLink = "https://newlms.magtu.ru/pluginfile.php/622284/mod_folder/content/0/";
 token = ENV["TOKEN_TG"];
 $branchArray = [{:number => 0, :id => 219213, :fileRoom => 622200}, {:number => 1, :id => 219208, :fileRoom => 622195},
  {:number => 2, :id => 219206, :fileRoom => 622193}, {:number => 3, :id => 219205, :fileRoom => 622192}];
@@ -17,58 +17,13 @@ groupArray = [];
 yearGroupArray = Array.new(DateTime.now.strftime("%y").to_i - (DateTime.now.strftime("%y").to_i - 5)) {|i|(DateTime.now.strftime("%y").to_i - 5) + (i + 1)};
 $weekArray = [{:name => "Понедельник", :number => 0}, {:name => "Понедельник", :number => 1}, {:name => "Вторник", :number => 2},
  {:name => "Среда", :number => 3}, {:name => "Четверг", :number => 4},{:name => "Пятница", :number => 5}, {:name => "Суббота", :number => 6}];
-## VARIABLES DEFINITION ##
 
-## FETCH HTML ##
-def getSheduleFile(type) 
-	groupArray = [];
-	parsGroupArray = [];
-	if(type == 0)
-		$branchArray.each do |item|
-			htmlDocument = Nokogiri::HTML(URI.open("https://newlms.magtu.ru/mod/folder/view.php?id=#{item[:id]}"))
-			htmlDocument.css('span.fp-filename-icon a').each_with_index do |link, i|
-			groupArray.push({:name => link.content.split(".")[0], :number => item[:number], :year => link.content.split("-")[1].to_i});
-			end
-		end
-	elsif(type == 1)
-		#htmlDocument = Nokogiri::HTML(URI.open("https://newlms.magtu.ru/mod/folder/view.php?id=219250"))
-		#htmlDocument.css('span.fp-filename-icon a').each_with_index do |link, i|
-		#	groupArray.push(link.content.split(".xlsx"));
-		#end
-		#groupArray.each_with_index do |item, i|
-		#	parsGroupArray[i] = Date.strptime(item[0].split(" - ")[1], '%d.%m.%y');
-		#end
-		#changeFile = URI.open(URI.escape("https://newlms.magtu.ru/pluginfile.php/622284/mod_folder/content/0/#{groupArray[parsGroupArray.rindex(parsGroupArray.max)][0]}.xlsx"));
-		#IO.copy_stream(changeFile, "./changeAgenda.xlsx");
-	end
-end
 
-## FETCH HTML ##
 
-## DATABASE ##
-def databaseConnection() 
-	$con = Mysql2::Client.new(:host => ENV["CLEARDB_LINK"], :username => ENV["CLEARDB_USERNAME"], :port => 3306, :database => ENV["DB_NAME"], :password => ENV["CLEARDB_KEY"]);
-end
-## DATABASE ##
-
-## KEYBOARDS ##
 staticKeyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: 
 	[["Первая подгруппа сегодня", "Вторая подгруппа сегодня"], ["Первая подгруппа завтра", "Вторая подгруппа завтра"], "Сменить группу"], one_time_keyboard: false, resize_keyboard: true);
 
-mainButtonsInlineKeyboard = [
-  Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Всё доступное первая подгруппа', callback_data: 0),
-  Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Всё доступное вторая подгруппа', callback_data: 1),
-  Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Вчерашний день первая подгруппа', callback_data: 2),
-  Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Вчерашний день вторая подгруппа', callback_data: 3),
-	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Донат', pay: true, callback_data: 4)
-	];
-
-mainMessageInlineKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: mainButtonsInlineKeyboard);
-
 groupJson = File.read('./groups.json');
-$inlineGroupButtons = [];
-$inlineGroupKeyboard = nil;
-
 
 selectBranch = [
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: '1 отделение', callback_data: '0,branchSelect'),
@@ -85,15 +40,12 @@ yearGroupArray.each do |item|
 end
 $inlineKeyboardSelectYear = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: yearSelect);
 $removeStaticKeyboard = Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true);
-## KEYBOARDS ##
 
-##	FUNCTION DEFINE	##
-def showInfoXlsx()
-	jsonArray = [];
-	Roo::Spreadsheet.open('./28.09.20 - 30.09.20.xlsx').sheet(0).row(2).compact.each_with_index do |name, i| 
-		jsonArray[i] = {:name => name};
-	end
-	File.write('./groups.json', JSON.dump(jsonArray))
+
+
+
+def databaseConnection() 
+	$con = Mysql2::Client.new(:host => ENV["CLEARDB_LINK"], :username => ENV["CLEARDB_USERNAME"], :port => 3306, :database => ENV["DB_NAME"], :password => ENV["CLEARDB_KEY"]);
 end
 
 def getBranchOfGroup(branch) 
@@ -102,22 +54,22 @@ def getBranchOfGroup(branch)
 	groupList.each do |item| 
 		if(item["number"] == branch)
 			$indeedGroupBranch.push(item);
-			
 		end
 	end
 	$bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите год поступления в колледж.</b>', reply_markup: $inlineKeyboardSelectYear, parse_mode: "HTML");
 end
+
 def getYearOfGroup(year) 
-	$inlineGroupButtons = [];
-	$inlineGroupKeyboard = {};
+	inlineGroupButtons = [];
+	#$inlineGroupKeyboard = {};
 
 	$indeedGroupBranch.each do |item|
 		if(item["year"] == year)
-			$inlineGroupButtons.push(Telegram::Bot::Types::InlineKeyboardButton.new(text: "#{item["name"]}", callback_data: "#{item["name"]},groupInput"))
+			inlineGroupButtons.push(Telegram::Bot::Types::InlineKeyboardButton.new(text: "#{item["name"]}", callback_data: "#{item["name"]},groupInput"))
 		end
 	end
-	$inlineGroupKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: $inlineGroupButtons);
-	$bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите вашу группу.</b>', reply_markup: $inlineGroupKeyboard, parse_mode: "HTML");
+	inlineGroupKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: inlineGroupButtons);
+	$bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите вашу группу.</b>', reply_markup: inlineGroupKeyboard, parse_mode: "HTML");
 end
 
 def showSheduleOfCollege(subgroup, selectedDay)
@@ -129,62 +81,32 @@ def showSheduleOfCollege(subgroup, selectedDay)
 		$bot.api.send_message(chat_id: $message.chat.id, text: '‎‎<b>Выберите ваше отделение.</b>', reply_markup: $inlineKeyboardSelectBranch, parse_mode: "HTML");
 	else
 		mysqlResult = result[0];
-		isActualData(mysqlResult["user_group"], 0);
+		isActualData(mysqlResult["user_group"]);
 		parsingData(mysqlResult["user_group"], subgroup, selectedDay);
 	end
 end
 
-def isActualData(groupName, type)
+def isActualData(groupName)
 	if (!File::exists?( "#{groupName}.xlsx"))
-		downloadingGroupXslx(groupName, type);
+		downloadingGroupXslx(groupName);
 		return 0;
 	end
 	currentTime = Time.now;
 	differenceTiming = (currentTime - File.ctime("./#{groupName}.xlsx"));
 	if (((Time.at(differenceTiming).utc.strftime("%H").to_f) + (Time.at(differenceTiming).utc.strftime("%M").to_f) / 60) >= 6)
 		File.delete("#{groupName}.xlsx");
-		downloadingGroupXslx(groupName, type);
+		downloadingGroupXslx(groupName);
 	end
 end
 
-def downloadingGroupXslx(name, type)
-	if(type == 0)
-		$bot.api.send_message(chat_id: $message.from.id, text: "Пожалуйста, подождите.");
-		JSON.parse(File.read('./groups.json')).each do |item|
-			if (item["name"] == name)
-				groupFileXlsx = URI.open(URI.escape("https://newlms.magtu.ru/pluginfile.php/#{$branchArray[item["number"]][:fileRoom]}/mod_folder/content/0/#{name}.xlsx"));
-				IO.copy_stream(groupFileXlsx, "./#{name}.xlsx");
-				break;
-			end
+def downloadingGroupXslx(name)
+	$bot.api.send_message(chat_id: $message.from.id, text: "Пожалуйста, подождите.");
+	JSON.parse(File.read('./groups.json')).each do |item|
+		if (item["name"] == name)
+			groupFileXlsx = URI.open(URI.escape("https://newlms.magtu.ru/pluginfile.php/#{$branchArray[item["number"]][:fileRoom]}/mod_folder/content/0/#{name}.xlsx"));
+			IO.copy_stream(groupFileXlsx, "./#{name}.xlsx");
+			break;
 		end
-	elsif(type == 1) 
-		groupArray = [];
-		parsGroupArray = [];
-
-		htmlDocument = Nokogiri::HTML(URI.open("https://newlms.magtu.ru/mod/folder/view.php?id=219250"))
-		htmlDocument.css('span.fp-filename-icon a').each_with_index do |link, i|
-			groupArray.push(link.content.split(".xlsx"));
-		end
-		groupArray.each_with_index do |item, i|
-			#parsGroupArray[i] = Date.strptime(item[0].split(" - ")[1], '%d.%m.%y');
-
-			FileUtils.mkdir_p './change_lessons/';
-			if(!File::exists?("./change_lessons/" + item[0] + ".xlsx"))
-				parsGroupArray[i] = Date.strptime(item[0].split(" - ")[1], '%d.%m.%y');
-				changeFile = URI.open(URI.escape("https://newlms.magtu.ru/pluginfile.php/622284/mod_folder/content/0/#{item[0]}.xlsx"));
-				IO.copy_stream(changeFile, "./change_lessons/#{item[0]}.xlsx");
-			end
-		end
-		Dir.entries("./change_lessons/").map {|item|
-			if(item != '.' && item != '..')
-				if(DateTime.now.to_date.between?(Date.strptime(item.split(" - ")[0], '%d.%m.%y'), Date.strptime(item.split(" - ")[0], '%d.%m.%y') + 2))
-
-				end
-			end
-			};
-			#Dir.entries("./change_lessons/").sort_by {|item| p item.split[" - "][0]}
-		#changeFile = URI.open(URI.escape("https://newlms.magtu.ru/pluginfile.php/622284/mod_folder/content/0/#{groupArray[parsGroupArray.rindex(parsGroupArray.max)][0]}.xlsx"));
-		#IO.copy_stream(changeFile, "./changeAgenda.xlsx");
 	end
 end
 
@@ -205,8 +127,6 @@ def parsingData(groupName, subgroup, day)
 	end
 	j = 1;
 	lessons = [];
- 	#p Date.today.wday;
-	#p Date.today.cweek.even?;
 
 	dayCoordinate = selectedDay[isEven.cweek.even? ? 0 : 1].coordinate;
 
@@ -232,14 +152,6 @@ def parsingData(groupName, subgroup, day)
 	end
 	sendingLessons = [];
 	changeLessons = parsingChangeFile(groupName, subgroup, day);
-
-	#changeLessons.map {|item| p item};
-	#p "divider"
-	#lessons.map {|item| p item};
-	#p lessons.length;
-	#p changeLessons.length;
-
-	#p "diver1"
 
 	if(lessons == [] && changeLessons != [])
 		sendingLessons = changeLessons;
@@ -302,7 +214,6 @@ def parsingData(groupName, subgroup, day)
 		stringLessons.push("№#{item[:number]} - #{item[:name]} - #{item[:teacher]} - #{item[:roomNumber]}")
 	}
 
-	#sendingLessons.map {|item| p item}
 	$bot.api.send_message(chat_id: $message.from.id, text: "Расписание #{groupName} #{subgroup} подгруппы ", parse_mode: "HTML");
 	$bot.api.send_message(chat_id: $message.from.id, text: stringLessons.join("\n"), parse_mode: "HTML");
 end
@@ -318,7 +229,7 @@ def parsingChangeFile(groupName, subgroup, day)
 	selectedDateFile = [];
 	groupArray = [];
 	parsGroupArray = [];
-	htmlDocument = Nokogiri::HTML(URI.open("https://newlms.magtu.ru/mod/folder/view.php?id=219250"))
+	htmlDocument = Nokogiri::HTML(URI.open($changePageLink))
 
 	htmlDocument.css('span.fp-filename-icon a').each_with_index do |link, i|
 		groupArray.push(link.content.split(".xlsx"));
@@ -326,17 +237,15 @@ def parsingChangeFile(groupName, subgroup, day)
 
 
 	groupArray.each_with_index do |item, i|
-		#parsGroupArray[i] = Date.strptime(item[0].split(" - ")[1], '%d.%m.%y');
 		FileUtils.mkdir_p './change_lessons/';
 		if(!File::exists?("./change_lessons/" + item[0] + ".xlsx"))
-			#p item[0].split(" - ")[1];
 			downloadingFile = item[0].split(" - ")[1];
 			if(downloadingFile == nil) 
 				downloadingFile = item[0];
 			end
 
 			parsGroupArray[i] = Date.strptime(downloadingFile, '%d.%m.%y');
-			changeFile = URI.open(URI.escape("https://newlms.magtu.ru/pluginfile.php/622284/mod_folder/content/0/#{item[0]}.xlsx"));
+			changeFile = URI.open(URI.escape("#{$changeFolderContainLink}#{item[0]}.xlsx"));
 			IO.copy_stream(changeFile, "./change_lessons/#{item[0]}.xlsx");
 		end
 	end
@@ -352,7 +261,6 @@ def parsingChangeFile(groupName, subgroup, day)
 			end
 		end
 		};
-	#isActualData("changeAgenda", 1);
 	if(File::exists?( "./change_lessons/#{selectedDateFile}")) 
 		selectedGroup = [];
 		changeAgenda = Roo::Spreadsheet.open("./change_lessons/#{selectedDateFile}").sheet(0);
@@ -368,7 +276,6 @@ def parsingChangeFile(groupName, subgroup, day)
 			return [];
 		end
 
-		#i = 0;
 		j = 3;
 		lessons = 0;
 		dayLessons = 0;
@@ -381,7 +288,6 @@ def parsingChangeFile(groupName, subgroup, day)
 				i = i + 1;
 			end 
 
-			##
 			if(changeAgenda.cell(j + lessons, 1) == $weekArray[Date.today.wday + day][:name])
 				dayLessons =  i;
 				for g in 0..(dayLessons)
@@ -425,7 +331,7 @@ def parsingChangeFile(groupName, subgroup, day)
 	end
 end
 
-##	FUNCTION DEFINE	##
+
 
 Telegram::Bot::Client.run(token) do |bot|
 	$bot = bot;
@@ -441,7 +347,7 @@ Telegram::Bot::Client.run(token) do |bot|
 						bot.api.send_message(chat_id: message.from.id, text: '‎‎<b>Ваш ID уже зарегестрирован.</b>', reply_markup: staticKeyboard, parse_mode: "HTML");
 					else
 						$con.query("insert into users (telegram_id, user_group) values (#{message.from.id}, '#{arrayCallBack[0]}')");
-						bot.api.send_message(chat_id: message.from.id, text: "Выша группа успешно выбрана: <b>#{arrayCallBack[0]}.</b>", reply_markup: staticKeyboard, parse_mode: "HTML");
+						bot.api.send_message(chat_id: message.from.id, text: "Ваша группа успешно выбрана: <b>#{arrayCallBack[0]}.</b>", reply_markup: staticKeyboard, parse_mode: "HTML");
 					end
 					$con.close;
 				elsif (arrayCallBack[1] == 'branchSelect') 
@@ -470,4 +376,3 @@ Telegram::Bot::Client.run(token) do |bot|
 		end
 	end
 end
-
