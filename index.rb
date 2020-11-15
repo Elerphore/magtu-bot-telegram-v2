@@ -114,11 +114,13 @@ def parsingData(groupName, subgroup, day)
 	selectedGroup = Roo::Spreadsheet.open("#{groupName}.xlsx").sheet(0);
 	selectedDay = [];
 	selecteDayNumber = Date.today.wday + day;
+	if (selecteDayNumber == 0)
+		 selecteDayNumber = 1;
+		 day += 1;
+	end
 	isEven = DateTime.now + day;
 
-	if (selecteDayNumber == 7)
-		 selecteDayNumber = 1;
-	end
+
 	selectedGroup.each_row_streaming do |row|
 		row.each do |item|
 			if (item.value == $weekArray[selecteDayNumber][:name]);
@@ -212,11 +214,11 @@ def parsingData(groupName, subgroup, day)
 	sendingLessons = sendingLessons.sort_by {|item| item[:number]}
 	stringLessons = [];
 	sendingLessons.map {|item| 
-		stringLessons.push("№#{item[:number]} - #{item[:name]} - #{item[:teacher]} - #{item[:roomNumber]}")
+		stringLessons.push("№#{item[:number]} #{item[:name]} #{item[:teacher].delete("\n")} #{item[:roomNumber]}")
 	}
 
-	$bot.api.send_message(chat_id: $message.from.id, text: "Расписание #{groupName} #{subgroup} подгруппы ", parse_mode: "HTML");
-	$bot.api.send_message(chat_id: $message.from.id, text: stringLessons.join("\n"), parse_mode: "HTML");
+	$bot.api.send_message(chat_id: $message.from.id, text: "Расписание <b>#{groupName}</b> #{subgroup} подгруппы на <b>#{$weekArray[selecteDayNumber][:name]}</b>\n
+#{stringLessons.join("\n")}", parse_mode: "HTML");
 end
 
 def parsingChangeFile(groupName, subgroup, day)
