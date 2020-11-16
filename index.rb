@@ -98,7 +98,7 @@ def showSheduleOfCollege(subgroup, selectedDay)
 end
 
 def isActualData(groupName)
-	if (!File::exists?( "#{groupName}.xlsx"))
+	if (!File::exists?( "#{groupName.downcase}.xlsx"))
 		downloadingGroupXslx(groupName);
 		return 0;
 	end
