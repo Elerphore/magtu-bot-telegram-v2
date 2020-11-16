@@ -19,7 +19,8 @@ $messageInlineKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_k
 mainSiteLink = "https://newlms.magtu.ru/mod/folder/view.php?id=";
 $changePageLink = "https://newlms.magtu.ru/mod/folder/view.php?id=219250";
 $changeFolderContainLink = "https://newlms.magtu.ru/pluginfile.php/622284/mod_folder/content/0/";
-token = ENV["TOKEN_TG"];
+#token = ENV["TOKEN_TG"];
+token = "1337747747:AAEW9WMFED6YSRcj3BGEH9iPR7_gR8pFmSU";
 $branchArray = [{:number => 0, :id => 219213, :fileRoom => 622200}, {:number => 1, :id => 219208, :fileRoom => 622195},
  {:number => 2, :id => 219206, :fileRoom => 622193}, {:number => 3, :id => 219205, :fileRoom => 622192}];
 groupArray = [];
@@ -56,7 +57,8 @@ $removeStaticKeyboard = Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_key
 
 
 def databaseConnection() 
-	$con = Mysql2::Client.new(:host => ENV["CLEARDB_LINK"], :username => ENV["CLEARDB_USERNAME"], :port => 3306, :database => ENV["DB_NAME"], :password => ENV["CLEARDB_KEY"]);
+	#$con = Mysql2::Client.new(:host => ENV["CLEARDB_LINK"], :username => ENV["CLEARDB_USERNAME"], :port => 3306, :database => ENV["DB_NAME"], :password => ENV["CLEARDB_KEY"]);
+	$con = Mysql2::Client.new(:host => "eu-cdbr-west-03.cleardb.net", :username => "b1273af1c61716", :port => 3306, :database => "heroku_e8b5fe4f47ec7a9", :password => "fffa5a6c");
 end
 
 def getBranchOfGroup(branch) 
@@ -113,9 +115,9 @@ end
 def downloadingGroupXslx(name)
 	$bot.api.send_message(chat_id: $message.from.id, text: "Пожалуйста, подождите.");
 	JSON.parse(File.read('./groups.json')).each do |item|
-		if (item["name"] == name)
-			groupFileXlsx = URI.open(URI.escape("https://newlms.magtu.ru/pluginfile.php/#{$branchArray[item["number"]][:fileRoom]}/mod_folder/content/0/#{name}.xlsx"));
-			IO.copy_stream(groupFileXlsx, "./#{name}.xlsx");
+		if (item["name"].downcase == name.downcase)
+			groupFileXlsx = URI.open(URI.escape("https://newlms.magtu.ru/pluginfile.php/#{$branchArray[item["number"]][:fileRoom]}/mod_folder/content/0/#{item["name"]}.xlsx"));
+			IO.copy_stream(groupFileXlsx, "./#{name.downcase}.xlsx");
 			break;
 		end
 	end
