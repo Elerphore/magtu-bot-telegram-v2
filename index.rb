@@ -37,6 +37,7 @@ selectBranch = [
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: '2 отделение', callback_data: '1,branchSelect'),
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: '3 отделение', callback_data: '2,branchSelect'),
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: '4 отделение', callback_data: '3,branchSelect'),
+	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Назад', callback_data: '3,branchSelect'),
 ];
 $inlineKeyboardSelectBranch = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: selectBranch);
 
@@ -221,7 +222,7 @@ def parsingData(groupName, subgroup, day)
 	sendingLessons = sendingLessons.sort_by {|item| item[:number]}
 	stringLessons = [];
 	sendingLessons.map {|item| 
-		stringLessons.push("№#{item[:number]} #{item[:name].split("  ")[0]} #{item[:teacher].delete("\n")} #{item[:roomNumber]}")
+		stringLessons.push("№#{item[:number]} #{item[:name].split("  ")[0]} #{item[:teacher]} #{item[:roomNumber]}")
 	}
 
 	$bot.api.send_message(chat_id: $message.from.id, text: "Расписание на <b>#{$weekArray[selecteDayNumber][:name]} (#{isEven.to_date}) <b>#{subgroup}</b> подгруппы #{groupName}  </b>\n
@@ -309,6 +310,7 @@ def parsingChangeFile(groupName, subgroup, day)
 
 		changeArray.compact.each do |item|
 			if(item[:lesson] != nil)
+				item[:lesson] = item[:lesson].delete("\n")
 				if(subgroup == 2 && item[:lesson].split("2. ")[subgroup - 1])
 					parsedArray.push({:lesson => item[:lesson].split("2. ")[1], :number => item[:number], :subgroup => 2});
 				elsif(subgroup == 1 && item[:lesson].split("2. ")[0].match?(/[1][.]/))
@@ -321,13 +323,14 @@ def parsingChangeFile(groupName, subgroup, day)
 
 		parsedArray.compact.each do |item|
 			if(item[:lesson] != nil)
-				teacher = item[:lesson].match(/\W{5,10}\s\W{1}[.]\W{1}[.]/);
-				numberRoom = item[:lesson].match(/\W{1}\d{2,3}/);
+				item[:lesson] = item[:lesson].delete("\n");
+				teacher = item[:lesson].match(/[а-яА-Я]{5,10}\s[а-яА-Я]{1,3}[.]{1}[а-яА-Я]{1,2}[.]{1}/);
 				name = item[:lesson].match(/[(]\W{2,8}[)]\s.{1,38}\S/).to_s.split(/\W{1}\d{3}/)[0];
+				item[:lesson].match?(/[а-яА-Я]{1,3}\d{1,3}/) ? numberRoom = item[:lesson].match(/[а-яА-Я]{1,3}\d{1,3}/) : numberRoom = item[:lesson].match(/[а-яА-Я][-]{1,3}\d{1,3}/);
 				if((teacher == nil && numberRoom == nil) && name)
 					teacher = " ";
 					numberRoom = " "
-				elsif(item[:lesson].match?(/^\D{12}\s{1,2}$/))
+				elsif(item[:lesson].to_s.gsub(/[1-9]{1}[.]{1}\s/, "").match?(/^\D{12}\s{1,2}$/))
 					name = "Пара отменена"
 					teacher = " ";
 					numberRoom = " "
