@@ -122,7 +122,7 @@ def downloadingGroupXslx(name)
 end
 
 def parsingData(groupName, subgroup, day) 
-	selectedGroup = Roo::Spreadsheet.open("#{groupName}.xlsx").sheet(0);
+	selectedGroup = Roo::Spreadsheet.open("#{groupName.downcase}.xlsx").sheet(0);
 	selectedDay = [];
 	selecteDayNumber = Date.today.wday + day;
 	if (selecteDayNumber == 0)
