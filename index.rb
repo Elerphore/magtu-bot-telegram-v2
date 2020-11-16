@@ -7,6 +7,8 @@ require 'nokogiri'
 require 'net/http'
 require 'fileutils'
 
+$backButtons = [Telegram::Bot::Types::InlineKeyboardButton.new(text: "Назад", callback_data: "1,back"), 
+	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Отмена', callback_data: 'cancel')];
 
 messageInlineKeyboardButtons = [
 Telegram::Bot::Types::InlineKeyboardButton.new(text: "\xF0\x9F\x92\xB5 Донат", url: 'https://sobe.ru/na/elerphore'),
@@ -17,7 +19,8 @@ $messageInlineKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_k
 mainSiteLink = "https://newlms.magtu.ru/mod/folder/view.php?id=";
 $changePageLink = "https://newlms.magtu.ru/mod/folder/view.php?id=219250";
 $changeFolderContainLink = "https://newlms.magtu.ru/pluginfile.php/622284/mod_folder/content/0/";
-token = ENV["TOKEN_TG"];
+#token = ENV["TOKEN_TG"];
+token = "1431204372:AAE9PlZHXrkdJJ7WpXUkCYMVpVnlPpbV4gI";
 $branchArray = [{:number => 0, :id => 219213, :fileRoom => 622200}, {:number => 1, :id => 219208, :fileRoom => 622195},
  {:number => 2, :id => 219206, :fileRoom => 622193}, {:number => 3, :id => 219205, :fileRoom => 622192}];
 groupArray = [];
@@ -37,7 +40,7 @@ selectBranch = [
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: '2 отделение', callback_data: '1,branchSelect'),
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: '3 отделение', callback_data: '2,branchSelect'),
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: '4 отделение', callback_data: '3,branchSelect'),
-	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Назад', callback_data: '3,branchSelect'),
+	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Отмена', callback_data: 'cancel'),
 ];
 $inlineKeyboardSelectBranch = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: selectBranch);
 
@@ -46,14 +49,16 @@ yearSelect = []
 yearGroupArray.each do |item|
 	yearSelect.push(Telegram::Bot::Types::InlineKeyboardButton.new(text: "#{item} год", callback_data: "#{item},yearSelect"))
 end
-$inlineKeyboardSelectYear = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: yearSelect);
+$inlineKeyboardSelectYear = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: yearSelect.push([Telegram::Bot::Types::InlineKeyboardButton.new(text: "Назад", callback_data: "1,back"), 
+	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Отмена', callback_data: 'cancel')]));
 $removeStaticKeyboard = Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true);
 
 
 
 
 def databaseConnection() 
-	$con = Mysql2::Client.new(:host => ENV["CLEARDB_LINK"], :username => ENV["CLEARDB_USERNAME"], :port => 3306, :database => ENV["DB_NAME"], :password => ENV["CLEARDB_KEY"]);
+	#$con = Mysql2::Client.new(:host => ENV["CLEARDB_LINK"], :username => ENV["CLEARDB_USERNAME"], :port => 3306, :database => ENV["DB_NAME"], :password => ENV["CLEARDB_KEY"]);
+	$con = Mysql2::Client.new(:host => "eu-cdbr-west-03.cleardb.net", :username => "b1273af1c61716", :port => 3306, :database => "heroku_e8b5fe4f47ec7a9", :password => "fffa5a6c");
 end
 
 def getBranchOfGroup(branch) 
@@ -76,7 +81,7 @@ def getYearOfGroup(year)
 			inlineGroupButtons.push(Telegram::Bot::Types::InlineKeyboardButton.new(text: "#{item["name"]}", callback_data: "#{item["name"]},groupInput"))
 		end
 	end
-	inlineGroupKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: inlineGroupButtons);
+	inlineGroupKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: inlineGroupButtons.push($backButtons));
 	$bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите вашу группу.</b>', reply_markup: inlineGroupKeyboard, parse_mode: "HTML");
 end
 
@@ -368,6 +373,14 @@ Telegram::Bot::Client.run(token) do |bot|
 					getBranchOfGroup(arrayCallBack[0].to_i);
 				elsif (arrayCallBack[1] == 'yearSelect') 
 					getYearOfGroup(arrayCallBack[0].to_i);
+				elsif(message.data == 'cancel')
+					bot.api.send_message(chat_id: message.from.id, text: "Смена группы отменена.", reply_markup: staticKeyboard, parse_mode: "HTML");
+				elsif(arrayCallBack[1] == 'back')
+					if(arrayCallBack[0])
+						bot.api.send_message(chat_id: message.from.id, text: "Смена группы отменена.", reply_markup: staticKeyboard, parse_mode: "HTML");
+					else
+					bot.api.send_message(chat_id: message.from.id, text: "Смена группы отменена.", reply_markup: staticKeyboard, parse_mode: "HTML");
+					end
 				end
 			when Telegram::Bot::Types::Message
 				if(message.text == '/start') 
@@ -376,7 +389,7 @@ Telegram::Bot::Client.run(token) do |bot|
 					databaseConnection();
 					$con.query("delete from users where telegram_id = #{message.from.id}");
 					$con.close;	
-					bot.api.send_message(chat_id: message.chat.id, text: '‎‎<b>Ваша группа была удалена.</b>', reply_markup: $removeStaticKeyboard, parse_mode: "HTML");
+					bot.api.send_message(chat_id: message.chat.id, text: '‎‎<b>Выбор новой группы.</b>', reply_markup: $removeStaticKeyboard, parse_mode: "HTML");
 					bot.api.send_message(chat_id: message.chat.id, text: '‎‎<b>Выберите ваше отделение.</b>', reply_markup: $inlineKeyboardSelectBranch, parse_mode: "HTML");
 				elsif (message.text == 'Первая подгруппа сегодня')
 					showSheduleOfCollege(1, 0);
