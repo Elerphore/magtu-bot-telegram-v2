@@ -103,7 +103,7 @@ def isActualData(groupName)
 		return 0;
 	end
 	currentTime = Time.now;
-	differenceTiming = (currentTime - File.ctime("./#{groupName}.xlsx"));
+	differenceTiming = (currentTime - File.ctime("./#{groupName.downcase}.xlsx"));
 	if (((Time.at(differenceTiming).utc.strftime("%H").to_f) + (Time.at(differenceTiming).utc.strftime("%M").to_f) / 60) >= 6)
 		File.delete("#{groupName}.xlsx");
 		downloadingGroupXslx(groupName);
