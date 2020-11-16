@@ -19,8 +19,7 @@ $messageInlineKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_k
 mainSiteLink = "https://newlms.magtu.ru/mod/folder/view.php?id=";
 $changePageLink = "https://newlms.magtu.ru/mod/folder/view.php?id=219250";
 $changeFolderContainLink = "https://newlms.magtu.ru/pluginfile.php/622284/mod_folder/content/0/";
-#token = ENV["TOKEN_TG"];
-token = "1431204372:AAE9PlZHXrkdJJ7WpXUkCYMVpVnlPpbV4gI";
+token = ENV["TOKEN_TG"];
 $branchArray = [{:number => 0, :id => 219213, :fileRoom => 622200}, {:number => 1, :id => 219208, :fileRoom => 622195},
  {:number => 2, :id => 219206, :fileRoom => 622193}, {:number => 3, :id => 219205, :fileRoom => 622192}];
 groupArray = [];
@@ -57,8 +56,7 @@ $removeStaticKeyboard = Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_key
 
 
 def databaseConnection() 
-	#$con = Mysql2::Client.new(:host => ENV["CLEARDB_LINK"], :username => ENV["CLEARDB_USERNAME"], :port => 3306, :database => ENV["DB_NAME"], :password => ENV["CLEARDB_KEY"]);
-	$con = Mysql2::Client.new(:host => "eu-cdbr-west-03.cleardb.net", :username => "b1273af1c61716", :port => 3306, :database => "heroku_e8b5fe4f47ec7a9", :password => "fffa5a6c");
+	$con = Mysql2::Client.new(:host => ENV["CLEARDB_LINK"], :username => ENV["CLEARDB_USERNAME"], :port => 3306, :database => ENV["DB_NAME"], :password => ENV["CLEARDB_KEY"]);
 end
 
 def getBranchOfGroup(branch) 
