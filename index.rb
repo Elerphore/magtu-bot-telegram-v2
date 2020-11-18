@@ -81,6 +81,10 @@ def getYearOfGroup(year)
 	inlineGroupButtons = [];
 	#$inlineGroupKeyboard = {};
 
+	if($indeedGroupBranch == nil)
+		return;
+	end
+	
 	$indeedGroupBranch.each do |item|
 		if(item["year"] == year)
 			inlineGroupButtons.push(Telegram::Bot::Types::InlineKeyboardButton.new(text: "#{item["name"]}", callback_data: "#{item["name"]},groupInput"))
