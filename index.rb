@@ -62,10 +62,7 @@ end
 def getBranchOfGroup(branch) 
 	$indeedGroupBranch = [];
 	groupList = JSON.parse(File.read('groups.json'));
-	p "GROUP LIST"
-	groupList.map {|item| p item}
 	groupList.each do |item| 
-		#p item;
 		if(item["number"] == branch)
 			$indeedGroupBranch.push(item);
 		end
@@ -344,7 +341,7 @@ def parsingChangeFile(groupName, subgroup, day)
 		parsedArray.compact.each do |item|
 			if(item[:lesson] != nil)
 				item[:lesson] = item[:lesson].delete("\n");
-				teacher = item[:lesson].match(/[а-яА-Я]{5,15}\s[а-яА-Я]{1,3}[.]{1}[а-яА-Я]{1,2}[.]{1}/);
+				teacher = item[:lesson].match(/[а-яА-Я]{5,15}\s{1,2}[а-яА-Я]{1,3}[.]{1}[а-яА-Я]{1,2}[.]{1}/);
 
 				#name = item[:lesson].match(/[(]\W{2,8}[)]\s.{1,38}\S/).to_s.split(/\W{1}\d{3}/)[0];
 
@@ -353,6 +350,8 @@ def parsingChangeFile(groupName, subgroup, day)
 					name = item[:lesson].match(/[а-яА-я]{2}[.][а-яА-я]{2}\s[(][а-яА-я]{2,5}[.]{1}[)]{1}/);
 				elsif(item[:lesson].match?(/[(]{1}[а-яА-я]{2,5}[)]{1}\s[а-яА-я-\s]{5,25}/))
 					name = item[:lesson].match(/[(]{1}[а-яА-я]{2,5}[)]{1}\s[а-яА-я-\s]{5,25}/)
+				elsif(item[:lesson].match?(/[(]{1}[а-яА-я-.]{2,10}[)]{1}\s[а-яА-я-.]{2,20}/))
+					name = item[:lesson].match(/[(]{1}[а-яА-я-.]{2,10}[)]{1}\s[а-яА-я-.]{2,20}/)
 				end
 
 
@@ -366,7 +365,6 @@ def parsingChangeFile(groupName, subgroup, day)
 					numberRoom = " "
 				elsif(teacher != nil && numberRoom != nil && name == nil)
 					name = "Час общения";
-
 				end
 				returningArray.push({:name => name, :roomNumber => numberRoom[0], :number => item[:number], :teacher => teacher[0], :subgroup => item[:subgroup]});
 			end
@@ -400,7 +398,6 @@ Telegram::Bot::Client.run(token) do |bot|
 						bot.api.send_message(chat_id: message.from.id, text: "Ваша группа успешно выбрана: <b>#{arrayCallBack[0]}.</b>", reply_markup: staticKeyboard, parse_mode: "HTML");
 					$con.close;
 				elsif (arrayCallBack[1] == 'branchSelect') 
-					p arrayCallBack;
 					getBranchOfGroup(arrayCallBack[0].to_i);
 				elsif (arrayCallBack[1] == 'yearSelect') 
 					getYearOfGroup(arrayCallBack[0].to_i);
