@@ -91,7 +91,7 @@ def getYearOfGroup(year)
 		#bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"] + 1)
 		$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
 	end
-	$bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите вашу группу.</b>', reply_markup: inlineGroupKeyboard, parse_mode: "HTML");
+	$previouseMessage = $bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите вашу группу.</b>', reply_markup: inlineGroupKeyboard, parse_mode: "HTML");
 end
 
 def showSheduleOfCollege(subgroup, selectedDay)
@@ -389,31 +389,34 @@ Telegram::Bot::Client.run(token) do |bot|
 				arrayCallBack = message.data.split(",");
 				if(arrayCallBack[1] == 'groupInput') 
 					databaseConnection();
-					result = $con.query("select * from users where telegram_id = #{message.from.id}");
-					if (result.count != 0) 
-						bot.api.send_message(chat_id: message.from.id, text: '‎‎<b>Ваш ID уже зарегестрирован.</b>', reply_markup: staticKeyboard, parse_mode: "HTML");
-					else
 						$con.query("delete from users where telegram_id = #{message.from.id}");
 						$con.query("insert into users (telegram_id, user_group) values (#{message.from.id}, '#{arrayCallBack[0]}')");
 						bot.api.send_message(chat_id: message.from.id, text: "Ваша группа успешно выбрана: <b>#{arrayCallBack[0]}.</b>", reply_markup: staticKeyboard, parse_mode: "HTML");
-					end
 					$con.close;
 				elsif (arrayCallBack[1] == 'branchSelect') 
 					getBranchOfGroup(arrayCallBack[0].to_i);
 				elsif (arrayCallBack[1] == 'yearSelect') 
 					getYearOfGroup(arrayCallBack[0].to_i);
 				elsif(message.data == 'cancel')
+					databaseConnection();
+					result = $con.query("select * from users where telegram_id = #{message.from.id}");
+					if (result.count == 0) 
+						bot.api.send_message(chat_id: message.from.id, text: '‎‎<b>Вы обязательно должны выбрать группу.</b>', parse_mode: "HTML");
+					else
+						if($previouseMessage != nil)
+							$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
+						end
 					bot.api.send_message(chat_id: message.from.id, text: "Смена группы отменена.", reply_markup: staticKeyboard, parse_mode: "HTML");
+					end
+					$con.close;
 				elsif(arrayCallBack[1] == 'back')
 					if(arrayCallBack[0].to_i == 1)
 						if($previouseMessage != nil)
-							#bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"] + 1)
 							bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"])
 						end
 						$previouseMessage = bot.api.send_message(chat_id: message.from.id, text: '‎‎<b>Выберите ваше отделение.</b>', reply_markup: $inlineKeyboardSelectBranch, parse_mode: "HTML");
 					elsif(arrayCallBack[0].to_i == 2)
 						if($previouseMessage != nil)
-							#bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"] + 1)
 							bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"])
 						end
 							$previouseMessage = $bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите год поступления в колледж.</b>', reply_markup: $inlineKeyboardSelectYear, parse_mode: "HTML");
