@@ -67,7 +67,11 @@ def getBranchOfGroup(branch)
 			$indeedGroupBranch.push(item);
 		end
 	end
-	$bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите год поступления в колледж.</b>', reply_markup: $inlineKeyboardSelectYear, parse_mode: "HTML");
+	if($previouseMessage != nil)
+#bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"] + 1)
+		$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
+	end
+	$previouseMessage = $bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите год поступления в колледж.</b>', reply_markup: $inlineKeyboardSelectYear, parse_mode: "HTML");
 end
 
 def getYearOfGroup(year) 
@@ -79,7 +83,14 @@ def getYearOfGroup(year)
 			inlineGroupButtons.push(Telegram::Bot::Types::InlineKeyboardButton.new(text: "#{item["name"]}", callback_data: "#{item["name"]},groupInput"))
 		end
 	end
-	inlineGroupKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: inlineGroupButtons.push($backButtons));
+	inlineGroupKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: inlineGroupButtons.push(
+		[Telegram::Bot::Types::InlineKeyboardButton.new(text: "Назад", callback_data: "2,back"), 
+		Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Отмена', callback_data: 'cancel')]
+	));
+	if($previouseMessage != nil)
+		#bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"] + 1)
+		$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
+	end
 	$bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите вашу группу.</b>', reply_markup: inlineGroupKeyboard, parse_mode: "HTML");
 end
 
@@ -225,7 +236,7 @@ def parsingData(groupName, subgroup, day)
 	sendingLessons = sendingLessons.sort_by {|item| item[:number]}
 	stringLessons = [];
 	sendingLessons.map {|item| 
-		stringLessons.push("№#{item[:number]} #{item[:name].split("  ")[0]} #{item[:teacher]} #{item[:roomNumber]}")
+		stringLessons.push("№#{item[:number]} #{item[:name]} #{item[:teacher]} #{item[:roomNumber]}")
 	}
 
 	$bot.api.send_message(chat_id: $message.from.id, text: "Расписание на <b>#{$weekArray[selecteDayNumber][:name]} (#{isEven.to_date}) <b>#{subgroup}</b> подгруппы #{groupName}  </b>\n
@@ -327,8 +338,18 @@ def parsingChangeFile(groupName, subgroup, day)
 		parsedArray.compact.each do |item|
 			if(item[:lesson] != nil)
 				item[:lesson] = item[:lesson].delete("\n");
-				teacher = item[:lesson].match(/[а-яА-Я]{5,10}\s[а-яА-Я]{1,3}[.]{1}[а-яА-Я]{1,2}[.]{1}/);
-				name = item[:lesson].match(/[(]\W{2,8}[)]\s.{1,38}\S/).to_s.split(/\W{1}\d{3}/)[0];
+				teacher = item[:lesson].match(/[а-яА-Я]{5,15}\s[а-яА-Я]{1,3}[.]{1}[а-яА-Я]{1,2}[.]{1}/);
+
+				#name = item[:lesson].match(/[(]\W{2,8}[)]\s.{1,38}\S/).to_s.split(/\W{1}\d{3}/)[0];
+
+
+				if(item[:lesson].match?(/[а-яА-я]{2}[.][а-яА-я]{2}\s[(][а-яА-я]{2,5}[.]{1}[)]{1}/))
+					name = item[:lesson].match(/[а-яА-я]{2}[.][а-яА-я]{2}\s[(][а-яА-я]{2,5}[.]{1}[)]{1}/);
+				elsif(item[:lesson].match?(/[(]{1}[а-яА-я]{2,5}[)]{1}\s[а-яА-я-\s]{5,25}/))
+					name = item[:lesson].match(/[(]{1}[а-яА-я]{2,5}[)]{1}\s[а-яА-я-\s]{5,25}/)
+				end
+
+
 				item[:lesson].match?(/[а-яА-Я]{1,3}\d{1,3}/) ? numberRoom = item[:lesson].match(/[а-яА-Я]{1,3}\d{1,3}/) : numberRoom = item[:lesson].match(/[а-яА-Я][-]{1,3}\d{1,3}/);
 				if((teacher == nil && numberRoom == nil) && name)
 					teacher = " ";
@@ -337,6 +358,9 @@ def parsingChangeFile(groupName, subgroup, day)
 					name = "Пара отменена"
 					teacher = " ";
 					numberRoom = " "
+				elsif(teacher != nil && numberRoom != nil && name == nil)
+					name = "Час общения";
+
 				end
 				returningArray.push({:name => name, :roomNumber => numberRoom[0], :number => item[:number], :teacher => teacher[0], :subgroup => item[:subgroup]});
 			end
@@ -345,6 +369,12 @@ def parsingChangeFile(groupName, subgroup, day)
 	else
 		$bot.api.send_message(chat_id: $message.from.id, text: "Боту не удалось получить доступ к файлу с заменами.", parse_mode: "HTML");
 		return [];
+	end
+end
+
+def deleteMessage(message)
+	if(message != nil)
+		bot.api.delete_message(chat_id: message.from.id, message_id: message["result"]["message_id"])
 	end
 end
 
@@ -363,6 +393,7 @@ Telegram::Bot::Client.run(token) do |bot|
 					if (result.count != 0) 
 						bot.api.send_message(chat_id: message.from.id, text: '‎‎<b>Ваш ID уже зарегестрирован.</b>', reply_markup: staticKeyboard, parse_mode: "HTML");
 					else
+						$con.query("delete from users where telegram_id = #{message.from.id}");
 						$con.query("insert into users (telegram_id, user_group) values (#{message.from.id}, '#{arrayCallBack[0]}')");
 						bot.api.send_message(chat_id: message.from.id, text: "Ваша группа успешно выбрана: <b>#{arrayCallBack[0]}.</b>", reply_markup: staticKeyboard, parse_mode: "HTML");
 					end
@@ -374,21 +405,26 @@ Telegram::Bot::Client.run(token) do |bot|
 				elsif(message.data == 'cancel')
 					bot.api.send_message(chat_id: message.from.id, text: "Смена группы отменена.", reply_markup: staticKeyboard, parse_mode: "HTML");
 				elsif(arrayCallBack[1] == 'back')
-					if(arrayCallBack[0])
-						bot.api.send_message(chat_id: message.from.id, text: "Смена группы отменена.", reply_markup: staticKeyboard, parse_mode: "HTML");
-					else
-					bot.api.send_message(chat_id: message.from.id, text: "Смена группы отменена.", reply_markup: staticKeyboard, parse_mode: "HTML");
+					if(arrayCallBack[0].to_i == 1)
+						if($previouseMessage != nil)
+							#bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"] + 1)
+							bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"])
+						end
+						$previouseMessage = bot.api.send_message(chat_id: message.from.id, text: '‎‎<b>Выберите ваше отделение.</b>', reply_markup: $inlineKeyboardSelectBranch, parse_mode: "HTML");
+					elsif(arrayCallBack[0].to_i == 2)
+						if($previouseMessage != nil)
+							#bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"] + 1)
+							bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"])
+						end
+							$previouseMessage = $bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите год поступления в колледж.</b>', reply_markup: $inlineKeyboardSelectYear, parse_mode: "HTML");
 					end
 				end
 			when Telegram::Bot::Types::Message
 				if(message.text == '/start') 
-					bot.api.send_message(chat_id: message.chat.id, text: '‎‎<b>Выберите ваше отделение.</b>', reply_markup: $inlineKeyboardSelectBranch, parse_mode: "HTML");
+					$previouseMessage = bot.api.send_message(chat_id: message.chat.id, text: '‎‎<b>Выберите ваше отделение.</b>', reply_markup: $inlineKeyboardSelectBranch, parse_mode: "HTML");
 				elsif(message.text == 'Сменить группу')
-					databaseConnection();
-					$con.query("delete from users where telegram_id = #{message.from.id}");
-					$con.close;	
 					bot.api.send_message(chat_id: message.chat.id, text: '‎‎<b>Выбор новой группы.</b>', reply_markup: $removeStaticKeyboard, parse_mode: "HTML");
-					bot.api.send_message(chat_id: message.chat.id, text: '‎‎<b>Выберите ваше отделение.</b>', reply_markup: $inlineKeyboardSelectBranch, parse_mode: "HTML");
+					$previouseMessage = bot.api.send_message(chat_id: message.chat.id, text: '‎‎<b>Выберите ваше отделение.</b>', reply_markup: $inlineKeyboardSelectBranch, parse_mode: "HTML");
 				elsif (message.text == 'Первая подгруппа сегодня')
 					showSheduleOfCollege(1, 0);
 				elsif (message.text == 'Вторая подгруппа сегодня')
