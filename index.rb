@@ -11,7 +11,7 @@ $backButtons = [Telegram::Bot::Types::InlineKeyboardButton.new(text: "Назад
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Отмена', callback_data: 'cancel')];
 
 messageInlineKeyboardButtons = [
-Telegram::Bot::Types::InlineKeyboardButton.new(text: "\xF0\x9F\x92\xB5 Поддержать", url: 'https://sobe.ru/na/elerphore'),
+Telegram::Bot::Types::InlineKeyboardButton.new(text: "\xF0\x9F\x92\xB5 Донат", url: 'https://sobe.ru/na/elerphore'),
     ]
 
 $messageInlineKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: messageInlineKeyboardButtons)
@@ -32,7 +32,7 @@ $weekArray = [{:name => "Понедельник", :number => 0}, {:name => "По
 staticKeyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: 
 	[["Первая подгруппа сегодня", "Вторая подгруппа сегодня"], ["Первая подгруппа завтра", "Вторая подгруппа завтра"], "Сменить группу"], one_time_keyboard: false, resize_keyboard: true);
 
-groupJson = File.read('./groups.json');
+groupJson = File.read('groups.json');
 
 selectBranch = [
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: '1 отделение', callback_data: '0,branchSelect'),
@@ -61,8 +61,11 @@ end
 
 def getBranchOfGroup(branch) 
 	$indeedGroupBranch = [];
-	groupList = JSON.parse(File.read('./groups.json'));
+	groupList = JSON.parse(File.read('groups.json'));
+	p "GROUP LIST"
+	groupList.map {|item| p item}
 	groupList.each do |item| 
+		#p item;
 		if(item["number"] == branch)
 			$indeedGroupBranch.push(item);
 		end
@@ -394,6 +397,7 @@ Telegram::Bot::Client.run(token) do |bot|
 						bot.api.send_message(chat_id: message.from.id, text: "Ваша группа успешно выбрана: <b>#{arrayCallBack[0]}.</b>", reply_markup: staticKeyboard, parse_mode: "HTML");
 					$con.close;
 				elsif (arrayCallBack[1] == 'branchSelect') 
+					p arrayCallBack;
 					getBranchOfGroup(arrayCallBack[0].to_i);
 				elsif (arrayCallBack[1] == 'yearSelect') 
 					getYearOfGroup(arrayCallBack[0].to_i);
