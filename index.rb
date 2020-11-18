@@ -70,10 +70,10 @@ def getBranchOfGroup(branch)
 			$indeedGroupBranch.push(item);
 		end
 	end
-	if($previouseMessage != nil)
+	#if($previouseMessage != nil)
 #bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"] + 1)
-		$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
-	end
+		#$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
+	#end
 	$previouseMessage = $bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите год поступления в колледж.</b>', reply_markup: $inlineKeyboardSelectYear, parse_mode: "HTML");
 end
 
@@ -84,7 +84,7 @@ def getYearOfGroup(year)
 	if($indeedGroupBranch == nil)
 		return;
 	end
-	
+
 	$indeedGroupBranch.each do |item|
 		if(item["year"] == year)
 			inlineGroupButtons.push(Telegram::Bot::Types::InlineKeyboardButton.new(text: "#{item["name"]}", callback_data: "#{item["name"]},groupInput"))
@@ -94,10 +94,9 @@ def getYearOfGroup(year)
 		[Telegram::Bot::Types::InlineKeyboardButton.new(text: "Назад", callback_data: "2,back"), 
 		Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Отмена', callback_data: 'cancel')]
 	));
-	if($previouseMessage != nil)
-		#bot.api.delete_message(chat_id: message.from.id, message_id: $previouseMessage["result"]["message_id"] + 1)
-		$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
-	end
+	#if($previouseMessage != nil)
+		#$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
+	#end
 	$previouseMessage = $bot.api.send_message(chat_id: $message.from.id, text: '‎‎<b>Выберите вашу группу.</b>', reply_markup: inlineGroupKeyboard, parse_mode: "HTML");
 end
 
@@ -411,9 +410,9 @@ Telegram::Bot::Client.run(token) do |bot|
 					if (result.count == 0) 
 						bot.api.send_message(chat_id: message.from.id, text: '‎‎<b>Вы обязательно должны выбрать группу.</b>', parse_mode: "HTML");
 					else
-						if($previouseMessage != nil)
-							$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
-						end
+						#if($previouseMessage != nil)
+						#	$bot.api.delete_message(chat_id: $message.from.id, message_id: $previouseMessage["result"]["message_id"])
+						#end
 					bot.api.send_message(chat_id: message.from.id, text: "Смена группы отменена.", reply_markup: staticKeyboard, parse_mode: "HTML");
 					end
 					$con.close;
