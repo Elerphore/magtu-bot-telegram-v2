@@ -11,7 +11,7 @@ $backButtons = [Telegram::Bot::Types::InlineKeyboardButton.new(text: "Назад
 	Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Отмена', callback_data: 'cancel')];
 
 messageInlineKeyboardButtons = [
-Telegram::Bot::Types::InlineKeyboardButton.new(text: "\xF0\x9F\x92\xB5 Донат", url: 'https://sobe.ru/na/elerphore'),
+Telegram::Bot::Types::InlineKeyboardButton.new(text: "\xF0\x9F\x92\xB5 Поддержать", url: 'https://sobe.ru/na/elerphore'),
     ]
 
 $messageInlineKeyboard = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: messageInlineKeyboardButtons)
